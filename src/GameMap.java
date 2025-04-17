@@ -10,23 +10,23 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class GameMap {
-    //private ArrayList<Room> rooms;
-    //private ArrayList<Item> items;
+    private ArrayList<Room> rooms;
+    private ArrayList<Items> items;
     private ArrayList<Puzzle> puzzles;
-   // private ArrayList<Enemy> enemies;
+    private ArrayList<Character> characters;
 
     public GameMap() {
-        //rooms = new ArrayList<>();
-       //items = new ArrayList<>();
+        rooms = new ArrayList<>();
+        items = new ArrayList<>();
         puzzles = new ArrayList<>();
-        //enemies = new ArrayList<>();
+        characters = new ArrayList<>();
     }
 
     //method to load item, puzzle, and rooms files
-    public void loadGameData(String itemsFile, String puzzlesFile, String monstersFile, String roomsFile) throws FileNotFoundException {
+    public void loadGameData(String itemsFile, String puzzlesFile, String charactersFile, String roomsFile) throws FileNotFoundException {
         loadItems(itemsFile);
         loadPuzzles(puzzlesFile);
-        loadMonsters(monstersFile);
+        loadCharacters(charactersFile);
         loadRooms(roomsFile);
     } //end loadGameData
 
@@ -59,21 +59,22 @@ public class GameMap {
                 line = input.nextLine().trim();
                 if (!line.isEmpty()) {
                     String[] parts = line.split("~", 4);
-                    String itemName = parts[0];
-                    String itemDescription = parts[1];
+                    String itemID = parts[0];
+                    String itemName = parts[1];
+                    String itemDescription = parts[2];
 
                     if (parts.length == 4) { //assuming the file format includes type, HP, and damage
-                        String itemType = parts[2];
-                        if (itemType.equalsIgnoreCase("Weapon")) {
+                        String tag = parts[3];
+                        if (tag.equalsIgnoreCase("Weapon")) {
                             int itemDMG = Integer.parseInt(parts[3]);
                             Weapon weapon = new Weapon(itemName, itemDescription, itemDMG);
                             items.add(weapon);
-                        } else if (itemType.equalsIgnoreCase("Consumable")) {
+                        } else if (tag.equalsIgnoreCase("Healing")) {
                             int itemHP = Integer.parseInt(parts[3]);
                             Consumable consumable = new Consumable(itemName, itemDescription, itemHP);
                             items.add(consumable);
                         }
-                    }
+                    } //end if p4
                 }
             }
         }
@@ -87,24 +88,28 @@ public class GameMap {
             while (input.hasNext()) {
                 line = input.nextLine().trim();
                 if(!line.isEmpty()) {
-                    String[] parts = line.split("~", 7);
-                    String puzzleArea = parts[0];
-                    int puzzleId = Integer.parseInt(parts[1]);
-                    String puzzleQuestion = parts[2];
-                    String puzzleAnswer = parts[3];
-                    String puzzlePassMsg = parts[4];
-                    String puzzleFailMsg = parts[5];
-                    int puzzleAttempts = Integer.parseInt(parts[6]);
+                    String[] parts = line.split("~", 10);
+                    String puzArea = parts[0];
+                    String puzId = parts[1];
+                    String puzRoomId = parts[2];
+                    String puzDesc = parts[3];
+                    String puzSol = parts[4];
+                    String puzPassMsg = parts[5];
+                    String puzFailMsg = parts[6];
+                    String puzReqItem = parts[7];
+                    int puzDmgOnfail = Integer.parseInt(parts[8]);
+                    int puzAttempts = Integer.parseInt(parts[9]);
 
-                    Puzzle puzzle = new Puzzle(puzzleArea, puzzleId, puzzleQuestion, puzzleAnswer, puzzlePassMsg, puzzleFailMsg, puzzleAttempts);
+                    Puzzle puzzle = new Puzzle(puzArea, puzId, puzRoomId, puzDesc, puzSol, puzPassMsg, puzFailMsg, puzReqItem,
+                            puzDmgOnfail, puzAttempts);
                     puzzles.add(puzzle);
                 }
             }
         } //end try
     } //end loadPuzzles
 
-    //method to load monsters from file
-    public void loadMonsters(String file) throws FileNotFoundException{
+    //method to load characters from file
+    public void loadCharacters(String file) throws FileNotFoundException{
         String line;
         try (Scanner input = new Scanner(new File(file))) {
             input.nextLine();
